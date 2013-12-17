@@ -1,0 +1,9 @@
+name = Elmshorn City Module
+description = Elmshorn City Drupal Modules.
+package = Webconsults Eu Modules
+core = 7.x
+files[] = menu_example.test
+
+
+
+

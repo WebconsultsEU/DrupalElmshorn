@@ -1,0 +1,162 @@
+<?php
+
+/**
+ * @defgroup elmshorn Example: Menu
+ * @ingroup elmshorn
+ * @{
+ *  Will have some city functions of Elmshorn added
+ *
+ * @see hook_menu()
+ * @see hook_menu_alter()
+ * @see hook_menu_link_alter()
+ * @see page_example
+ * @see page_example_menu()
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function elmshorn_menu() {
+
+  // A simple example which defines a page callback and a menu entry.
+
+  // Menu items are defined by placing them in an $items array. The array key
+  // (in this case 'menu_example') is the path that defines the menu router
+  // entry, so the page will be accessible from the URL
+  // example.com/examples/menu_example.
+  $items['elmshorn/city'] = array(
+    // We are using the default menu type, so this can be omitted.
+    // 'type' => MENU_NORMAL_ITEM,
+
+    // The menu title. Do NOT use t() which is called by default. You can
+    // override the use of t() by defining a 'title callback'. This is explained
+    // in the 'menu_example/title_callbacks' example below.
+    'title' => 'Elmshorn',
+
+    // Description (hover flyover for menu link). Does NOT use t(), which is
+    // called automatically.
+    'description' => 'Menu information from the elmshorn type',
+
+    // Function to be called when this path is accessed.
+    'page callback' => '_elmshorn_basic_menu',
+
+    // Arguments to the page callback. Here's we'll use them just to provide
+    // content for our page.
+    'page arguments' => array(t('This is the example callback.', array('!link' => url('elmshorn/city')))),
+
+    // If the page is meant to be accessible to all users, you can set 'access
+    // callback' to TRUE. This bypasses all access checks. For an explanation on
+    // how to use the permissions system to restrict access for certain users,
+    // see the example 'examples/menu_example/permissioned/controlled' below.
+    'access callback' => TRUE,
+
+    // If the page callback is located in another file, specify it here and
+    // that file will be automatically loaded when needed.
+    // 'file' => 'elmshorn.module',
+
+    // We can choose which menu gets the link. The default is 'navigation'.
+    // 'menu_name' => 'navigation',
+
+    // Show the menu link as expanded.
+    'expanded' => TRUE,
+  );
+
+  //
+  return $items;
+}
+
+/**
+ * Page callback for the simplest introduction menu entry.
+ *
+ * @param $content
+ *   Some content passed in.
+ */
+function _elmshorn_basic_menu($content = NULL) {
+  $base_content = t(
+  'This is an example page from elmshorn module
+  ');
+  return '<div>' . $base_content . '</div><br /><div>' . $content . '</div>';
+}
+
+/**
+ * Page callback for use with most of the menu entries. The arguments it
+ * receives determine what it outputs.
+ *
+ * @param $content
+ *   The base content to output.
+ * @param $arg1
+ *   First additional argument from the path used to access the menu
+ * @param $arg2
+ *   Second additional argument.
+ */
+function _elmshorn_example_menu_page($content = NULL, $arg1 = NULL, $arg2 = NULL) {
+  $output =  '<div>' . $content . '</div>';
+
+  if (!empty($arg1)) {
+    $output .= '<div>' . t('Argument 1=%arg', array('%arg' => $arg1)) . '</div>';
+  }
+  if (!empty($arg2)) {
+    $output .= '<div>' . t('Argument 2=%arg', array('%arg' => $arg2)) . '</div>';
+  }
+  return $output;
+}
+
+/**
+ * Implements hook_permission() to provide a demonstration access string.
+ */
+
+function menu_example_permission() {
+  return array(
+    'access protected menu example' =>  array(
+      'title' => t('Access the protected menu example'),
+    ),
+  );
+
+}
+
+
+/**
+ * Title callback to rewrite the '/user' menu link.
+ *
+ * @param $base_string
+ *   string to be prepended to current user's name.
+ */
+function _menu_example_simple_title_callback($base_string) {
+  global $user;
+  $username = !empty($user->name) ? $user->name : t('anonymous');
+  return $base_string . ' ' . $username;
+}
+/**
+ * Title callback to rename the title dynamically, based on user_page_title().
+ *
+ * @param $account
+ *   User account related to the visited page.
+ */
+function menu_example_user_page_title($account) {
+  return is_object($account) ? t("@name's account", array('@name' => format_username($account))) : '';
+}
+
+/**
+ * Implements hook_menu_link_alter().
+ *
+ * This code will get the chance to alter a menu link when it is being saved
+ * in the menu interface at admin/build/menu. Whatever we do here overrides
+ * anything the user/administrator might have been trying to do.
+ *
+ * @param $item
+ *   The menu item being saved.
+ * @param $menu
+ *   The entire menu router table.
+ */
+function menu_elmshorn_link_alter(&$item, $menu) {
+  // Force the link title to remain 'Clear Cache' no matter what the admin
+  // does with the web interface.
+  if ($item['link_path'] == 'devel/cache/clear') {
+     $item['link_title'] = 'Clear Cache';
+  };
+}
+
+
+/**
+ * @} End of "defgroup elmshorn".
+ */
